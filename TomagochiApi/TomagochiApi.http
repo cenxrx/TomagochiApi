@@ -1,0 +1,6 @@
+@TomagochiApi_HostAddress = http://localhost:5095
+
+GET {{TomagochiApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
