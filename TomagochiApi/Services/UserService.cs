@@ -14,9 +14,9 @@ public class UserService
         _inventoryRepository = inventoryRepository;
     }
 
-    public async Task<User> CreateUser(User user)
+    public async Task<User> CreateUser(string email, string password, bool isAdmin)
     {
-        if (await _userRepository.CheckIfEmailExists(user.Email))
+        if (await _userRepository.CheckIfEmailExists(email))
             throw new ArgumentException("Email already exists");
 
         var inventory = new Inventory { CarrotCount = 0, WaterCount = 0, MeatCount = 0 };
@@ -24,9 +24,9 @@ public class UserService
         
         var newUser = new User
         {
-            Email = user.Email,
-            Password = user.Password, //  должно быть хеширование
-            IsAdmin = user.IsAdmin,
+            Email = email,
+            Password = password, //  должно быть хеширование
+            IsAdmin = isAdmin,
             InventoryId = createdInventory.id
         };
 

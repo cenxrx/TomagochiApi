@@ -1,0 +1,17 @@
+﻿services:
+  app:
+    build:
+      dockerfile: ./Dockerfile
+    ports:
+      - "8090:8080"
+    restart: always
+    environment:
+      ConnectionStrings__MongoDB: "mongodb://host.docker.internal:27018"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  
+  mongo:
+    restart: always
+    image: mongo
+    ports: 
+      - "27018:27017"

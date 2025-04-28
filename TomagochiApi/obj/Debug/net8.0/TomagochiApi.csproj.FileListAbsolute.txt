@@ -44,3 +44,4 @@ E:\проекты\TomagochiApi\TomagochiApi\obj\Debug\net8.0\refint\TomagochiApi
 E:\проекты\TomagochiApi\TomagochiApi\obj\Debug\net8.0\TomagochiApi.pdb
 E:\проекты\TomagochiApi\TomagochiApi\obj\Debug\net8.0\TomagochiApi.genruntimeconfig.cache
 E:\проекты\TomagochiApi\TomagochiApi\obj\Debug\net8.0\ref\TomagochiApi.dll
+E:\проекты\TomagochiApi\TomagochiApi\obj\Debug\net8.0\TomagochiApi.sourcelink.json

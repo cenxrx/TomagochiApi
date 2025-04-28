@@ -16,11 +16,11 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] User user)
+    public async Task<IActionResult> Register(string email, string password, bool isAdmin)
     {
         try
         {
-            var createdUser = await _userService.CreateUser(user);
+            var createdUser = await _userService.CreateUser(email, password, isAdmin);
             return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
         }
         catch (ArgumentException ex)

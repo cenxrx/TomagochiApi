@@ -25,7 +25,7 @@ public class InventoryController : ControllerBase
             return NotFound();
         }
     }
-
+//добавить jwt token
     [HttpPost("{inventoryId}/add")]
     public async Task<IActionResult> AddItems(
         string inventoryId, 

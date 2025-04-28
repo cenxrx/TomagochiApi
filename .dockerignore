@@ -1,0 +1,10 @@
+﻿**/.git
+**/bin
+**/obj
+**/.vs
+**/node_modules
+Dockerfile
+.dockerignore
+*.user
+*.suo
+*.lock
