@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using TomagochiApi.Interfaces;
 using TomagochiApi.Models;
 
@@ -35,11 +36,21 @@ public class InventoryRepository : IInventoryRepository
         await _inventoryCollection.DeleteOneAsync(i => i.id == id);
     }
 
-    public async Task<Inventory> AddItemToInventory(string inventoryId, string itemType, int quantity)
+    public async Task<Inventory> AddItemToInventory(string inventoryId, string itemName, int quantity)
     {
-        var filter = Builders<Inventory>.Filter.Eq(i => i.id, inventoryId);
-        var update = Builders<Inventory>.Update.Inc($"{itemType}Count", quantity);
-        
+        if (string.IsNullOrEmpty(itemName))
+            throw new ArgumentException("Имя предмета не может быть пустым", nameof(itemName));
+
+        if (quantity <= 0)
+            throw new ArgumentException("Количество должно быть положительным", nameof(quantity));
+
+        var filter = Builders<Inventory>.Filter.And(
+            Builders<Inventory>.Filter.Eq(i => i.id, inventoryId),
+            Builders<Inventory>.Filter.ElemMatch(i => i.items, item => item.Name == itemName)
+        );
+
+        var update = Builders<Inventory>.Update.Inc(i => i.items.FirstMatchingElement().Count, quantity);
+
         var options = new FindOneAndUpdateOptions<Inventory>
         {
             ReturnDocument = ReturnDocument.After
@@ -48,16 +59,21 @@ public class InventoryRepository : IInventoryRepository
         return await _inventoryCollection.FindOneAndUpdateAsync(filter, update, options);
     }
 
-    public async Task<Inventory> RemoveItemfromInventory(string inventoryId, string itemType, int quantity)
+    public async Task<Inventory> RemoveItemFromInventory(string inventoryId, string itemName, int quantity)
     {
+        if (string.IsNullOrEmpty(itemName))
+            throw new ArgumentException("Имя предмета не может быть пустым", nameof(itemName));
+
+        if (quantity <= 0)
+            throw new ArgumentException("Количество должно быть положительным", nameof(quantity));
+
         var filter = Builders<Inventory>.Filter.And(
             Builders<Inventory>.Filter.Eq(i => i.id, inventoryId),
-            Builders<Inventory>.Filter.Gte($"{itemType}Count", quantity)
+            Builders<Inventory>.Filter.ElemMatch(i => i.items, item => item.Name == itemName && item.Count >= quantity)
         );
-        
-        var update = Builders<Inventory>.Update.Inc($"{itemType}Count", -quantity);
 
-        
+        var update = Builders<Inventory>.Update.Inc(i => i.items.FirstMatchingElement().Count, -quantity);
+
         var options = new FindOneAndUpdateOptions<Inventory>
         {
             ReturnDocument = ReturnDocument.After,
@@ -66,14 +82,12 @@ public class InventoryRepository : IInventoryRepository
 
         try
         {
-            return await _inventoryCollection.FindOneAndUpdateAsync(
-                filter, 
-                update, 
-                options
-            );
+            return await _inventoryCollection.FindOneAndUpdateAsync(filter, update, options);
         }
         catch (Exception ex)
         {
+            // Логирование ошибки
+            Console.WriteLine($"Ошибка при удалении предмета '{itemName}': {ex.Message}");
             return null;
         }
     }

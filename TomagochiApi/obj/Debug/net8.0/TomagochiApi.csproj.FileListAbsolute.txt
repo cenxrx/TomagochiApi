@@ -45,3 +45,12 @@ E:\проекты\TomagochiApi\TomagochiApi\obj\Debug\net8.0\TomagochiApi.pdb
 E:\проекты\TomagochiApi\TomagochiApi\obj\Debug\net8.0\TomagochiApi.genruntimeconfig.cache
 E:\проекты\TomagochiApi\TomagochiApi\obj\Debug\net8.0\ref\TomagochiApi.dll
 E:\проекты\TomagochiApi\TomagochiApi\obj\Debug\net8.0\TomagochiApi.sourcelink.json
+E:\проекты\TomagochiApi\TomagochiApi\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+E:\проекты\TomagochiApi\TomagochiApi\bin\Debug\net8.0\Microsoft.Bcl.Memory.dll
+E:\проекты\TomagochiApi\TomagochiApi\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+E:\проекты\TomagochiApi\TomagochiApi\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+E:\проекты\TomagochiApi\TomagochiApi\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+E:\проекты\TomagochiApi\TomagochiApi\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+E:\проекты\TomagochiApi\TomagochiApi\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+E:\проекты\TomagochiApi\TomagochiApi\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+E:\проекты\TomagochiApi\TomagochiApi\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll

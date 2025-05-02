@@ -9,5 +9,5 @@ public interface IInventoryRepository
     Task UpdateInventory(string id, Inventory inventory);
     Task DeleteInventory(string id);
     Task<Inventory> AddItemToInventory(string inventoryId, string itemType, int quantity);
-    Task<Inventory> RemoveItemfromInventory(string inventoryId, string itemType, int quantity);
+    Task<Inventory> RemoveItemFromInventory(string inventoryId, string itemType, int quantity);
 }

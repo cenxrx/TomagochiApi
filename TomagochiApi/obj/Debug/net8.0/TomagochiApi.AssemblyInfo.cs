@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TomagochiApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51972329aaa1e91c0264ce77e787ab8d66d9cca6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eee74bf5b6beaf7d90b57d97ce16d5dd4e77a667")]
 [assembly: System.Reflection.AssemblyProductAttribute("TomagochiApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TomagochiApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

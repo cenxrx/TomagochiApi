@@ -1,5 +1,4 @@
-﻿// UsersController.cs
-
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TomagochiApi.Models;
 using TomagochiApi.Services;
@@ -15,12 +14,15 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
+    /// <summary>
+    /// Регистрация нового пользователя (без JWT)
+    /// </summary>
     [HttpPost("register")]
-    public async Task<IActionResult> Register(string email, string password, bool isAdmin)
+    public async Task<IActionResult> Register(User user)
     {
         try
         {
-            var createdUser = await _userService.CreateUser(email, password, isAdmin);
+            var createdUser = await _userService.CreateUser(user);
             return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
         }
         catch (ArgumentException ex)
@@ -29,35 +31,96 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, ex.Message);
+            return StatusCode(500, $"Ошибка при регистрации: {ex.Message}");
         }
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetUser(string id)
+    /// <summary>
+    /// Получить пользователя по ID (требуется JWT)
+    /// </summary>
+    [HttpGet("")]
+    [Authorize]
+    public async Task<IActionResult> GetUser()
     {
         try
         {
-            var user = await _userService.GetUserById(id);
-            return Ok(user);
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+            if (userIdClaim != null)
+            {
+                var user = await _userService.GetUserById(userIdClaim);
+                return Ok(user);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
         catch (KeyNotFoundException)
         {
-            return NotFound();
+            return NotFound("Пользователь не найден");
         }
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(string id, [FromBody] UserUpdateDto updateDto)
+    /// <summary>
+    /// Получить инвентарь пользователя (требуется JWT)
+    /// </summary>
+    [HttpGet("/inventory")]
+    [Authorize]
+    public async Task<IActionResult> GetUserInventory()
     {
         try
         {
-            await _userService.UpdateUser(id, updateDto);
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+            if (userIdClaim != null)
+            {
+                var inventory = await _userService.GetInventoryByUserId(userIdClaim);
+                return Ok(inventory);
+            }
+            else
+                return Unauthorized();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Получить питомца пользователя (требуется JWT)
+    /// </summary>
+    [HttpGet("/pet")]
+    [Authorize]
+    public async Task<IActionResult> GetUserPet()
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+            var pet = await _userService.GetPetByUserId(userIdClaim);
+            return Ok(pet);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Обновить данные пользователя (требуется JWT)
+    /// </summary>
+    [HttpPut()]
+    [Authorize]
+    public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDto updateDto)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+            if (userIdClaim != null)
+                await _userService.UpdateUser(userIdClaim, updateDto);
             return NoContent();
         }
         catch (KeyNotFoundException)
         {
-            return NotFound();
+            return NotFound("Пользователь не найден");
         }
         catch (ArgumentException ex)
         {
@@ -65,38 +128,50 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteUser(string id)
+    /// <summary>
+    /// Удалить пользователя (требуется JWT)
+    /// </summary>
+    [HttpDelete()]
+    [Authorize]
+    public async Task<IActionResult> DeleteUser()
     {
         try
         {
-            await _userService.DeleteUser(id);
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+            if (userIdClaim != null) await _userService.DeleteUser(userIdClaim);
             return NoContent();
         }
         catch (KeyNotFoundException)
         {
-            return NotFound();
+            return NotFound("Пользователь не найден");
         }
     }
 
+    /// <summary>
+    /// Вход в систему (без JWT)
+    /// </summary>
+    // POST: api/auth/login
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest login)
     {
         try
         {
-            var isValid = await _userService.ValidateCredentials(request.Email, request.Password);
-            if (!isValid) return Unauthorized();
-            
-            var user = await _userService.GetUserByEmail(request.Email);
-            return Ok(new { user.Id, user.Email });
+            var token = await _userService.AuthenticateUser(login.Email, login.Password);
+
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized(new { message = "Invalid email or password" });
+
+            return Ok(new { Token = token });
         }
-        catch (KeyNotFoundException)
+        catch (Exception ex)
         {
-            return NotFound();
+            // Логируйте ошибку (например, в файл или консоль)
+            return StatusCode(500, new { message = "Internal server error", error = ex.Message });
         }
     }
 }
 
+// DTO для входа
 public class LoginRequest
 {
     public string Email { get; set; }
