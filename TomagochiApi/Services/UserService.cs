@@ -35,13 +35,20 @@ public class UserService
         return GenerateJwtToken(user);
     }
 
-    public async Task<User> CreateUser(User user)
+    public async Task<User> CreateUser(UserUpdateDto userDTO)
     {
-        if (user == null)
-            throw new NullReferenceException(nameof(user));
-        if (await _userRepository.CheckIfEmailExists(user.Email))
+        if (userDTO == null)
+            throw new NullReferenceException(nameof(userDTO));
+        if (await _userRepository.CheckIfEmailExists(userDTO.Email))
             throw new ArgumentException("Email already exists");
 
+        var user = new User
+        {
+            Email = userDTO.Email,
+            Name = userDTO.Name,
+            Password = userDTO.Password,
+            IsAdmin = false
+        };
         var inventory = new Inventory();
         var createdInventory = await _inventoryRepository.CreateInventory(inventory);
         user.InventoryId = createdInventory.id;

@@ -18,7 +18,7 @@ public class UsersController : ControllerBase
     /// Регистрация нового пользователя (без JWT)
     /// </summary>
     [HttpPost("register")]
-    public async Task<IActionResult> Register(User user)
+    public async Task<IActionResult> Register(UserUpdateDto user)
     {
         try
         {
