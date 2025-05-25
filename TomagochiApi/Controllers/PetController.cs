@@ -45,7 +45,35 @@ public class PetController : ControllerBase
             return StatusCode(500, $"Ошибка при создании питомца: {ex.Message}");
         }
     }
+    /// <summary>
+    /// Переименовать питомца (требуется JWT)
+    /// </summary>
+    [HttpPost("update-name")]
+    [Authorize]
+    public async Task<IActionResult> UpdatePetName([FromQuery] string newName)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized("Пользователь не найден в токене");
 
+            var updatedPet = await _petService.UpdatePetName(userIdClaim, newName);
+            return Ok(updatedPet);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message); // 404
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message); // 400
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Ошибка при переименовании: {ex.Message}"); // 500
+        }
+    }
     /// <summary>
     /// Получить питомца пользователя (требуется JWT)
     /// </summary>

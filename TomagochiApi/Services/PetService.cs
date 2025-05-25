@@ -21,6 +21,19 @@ public class PetService
         _inventoryRepository = inventoryRepository;
     }
 
+    public async Task<Pet> UpdatePetName(string userId, string newName)
+    {
+        var user = await _userRepository.GetUser(userId);
+        if(user == null)
+            throw new KeyNotFoundException("user not found");
+        var pet = await _petRepository.GetPet(user.PetID);
+        CheckIfAlive(pet);
+    
+        pet.Name = newName;
+        await _petRepository.UpdatePet(pet.Id, pet);
+        return pet;
+    }
+    
     public async Task<Pet> GetPet(string id)
     {
         var pet = await _petRepository.GetPet(id);
@@ -32,7 +45,7 @@ public class PetService
         return pet;
     }
 
-    public async Task<Pet> GetPetByUserId(string userId)
+    public async Task<Pet>  GetPetByUserId(string userId)
     {
         var user = await _userRepository.GetUser(userId);
         if (string.IsNullOrEmpty(user.PetID))
